@@ -27,4 +27,21 @@ pub mod utils {
             })
             .unzip()
     }
+
+    pub fn rows_from_file<T: FromStr>(path: &str) -> Vec<Vec<T>>
+    where
+        T::Err: Debug,
+    {
+        lines_from_file(path)
+            .map(|line| -> Vec<T> {
+                line.unwrap()
+                    .split_whitespace()
+                    .map(|word: &str| {
+                        word.parse::<T>()
+                            .expect(&format!("Failed to parse: {}.", word))
+                    })
+                    .collect_vec()
+            })
+            .collect_vec()
+    }
 }

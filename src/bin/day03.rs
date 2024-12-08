@@ -1,5 +1,6 @@
-use regex::{Captures, Regex};
-use rusty_advent_2024::utils::{self, lines_from_file};
+use itertools::Itertools;
+use regex::Regex;
+use rusty_advent_2024::utils::lines_from_file;
 
 fn main() {
     println!("Answer to part 1:");
@@ -38,8 +39,18 @@ fn part1(path: &str) -> i32 {
         .sum()
 }
 
-fn part2(_path: &str) -> i32 {
-    0
+fn part2(path: &str) -> i32 {
+    let total_string = lines_from_file(path)
+        .map(|line| line.unwrap())
+        .collect_vec()
+        .join(" ");
+
+    // Remove anything from don't() to either do() or the string end
+    let dont_mul_pattern: Regex =
+        Regex::new(r"don\'t\(\).*?(?:do\(\)|$)").expect("Regex pattern invalid.");
+    let enbaled_instructions = dont_mul_pattern.replace_all(&total_string, "");
+
+    compute_sum(&enbaled_instructions)
 }
 
 #[cfg(test)]
@@ -56,6 +67,6 @@ mod tests {
 
     #[test]
     fn test_part2() {
-        assert!(part2("input/input03.txt.test1") == 0);
+        assert!(part2("input/input03.txt.test2") == 48);
     }
 }

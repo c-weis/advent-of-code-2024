@@ -1,5 +1,33 @@
 use rusty_advent_2024::utils;
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+enum ReportType {
+    Unsafe,
+    Trivial,
+    Increasing,
+    Decreasing,
+}
+
+impl ReportType {
+    pub fn is_safe(&self) -> bool {
+        match self {
+            ReportType::Unsafe => false,
+            _ => true,
+        }
+    }
+
+    pub fn combined_with(&self, other_type: &ReportType) -> ReportType {
+        match (self, other_type) {
+            (ReportType::Unsafe, _)
+            | (_, ReportType::Unsafe)
+            | (ReportType::Decreasing, ReportType::Increasing)
+            | (ReportType::Increasing, ReportType::Decreasing) => ReportType::Unsafe,
+            (ReportType::Trivial, other_type) => *other_type,
+            (my_type, _) => *my_type,
+        }
+    }
+}
+
 fn main() {
     println!("Answer to part 1:");
     println!("{}", part1("input/input02.txt"));
@@ -18,25 +46,73 @@ fn is_safe_decrease(difference: i32) -> bool {
     is_safe_increase(-difference)
 }
 
-fn is_safe_report(report: &Vec<i32>) -> bool {
+fn report_type(report: &[i32]) -> ReportType {
     if report.len() < 2 {
-        return true;
+        return ReportType::Trivial;
     }
 
     let mut differences = report.into_iter().zip(&report[1..]).map(|(v1, v2)| v2 - v1);
-    match report[1] > report[0] {
-        true => differences.all(is_safe_increase),
-        false => differences.all(is_safe_decrease),
+
+    if report[1] > report[0] && differences.all(is_safe_increase) {
+        return ReportType::Increasing;
+    } else if report[1] < report[0] && differences.all(is_safe_decrease) {
+        return ReportType::Decreasing;
     }
+    return ReportType::Unsafe;
+}
+
+fn is_safe_report(report: &[i32]) -> bool {
+    report_type(report).is_safe()
+}
+
+fn is_safe_report_with_damper(report: &[i32]) -> bool {
+    if report.len() < 3 {
+        return true;
+    }
+
+    // Deal with special cases first
+    if is_safe_report(&report[1..]) || is_safe_report(&report[..report.len() - 1]) {
+        return true;
+    }
+
+    // Try removing elements individually
+    for idx in 1..report.len() - 1 {
+        let left = &report[..idx];
+        let left_type = report_type(left);
+        if !left_type.is_safe() {
+            // if the left report is already unsafe, we cannot salvage it
+            return false;
+        }
+
+        let mid = &vec![report[idx - 1], report[idx + 1]];
+        let right_needs_type = report_type(mid).combined_with(&left_type);
+        if !right_needs_type.is_safe() {
+            continue;
+        }
+
+        let right = &report[idx + 1..];
+        let right_type = report_type(right);
+        if right_type.combined_with(&right_needs_type).is_safe() {
+            return true;
+        }
+    }
+    return false;
 }
 
 fn part1(path: &str) -> usize {
     let reports = utils::rows_from_file::<i32>(path);
-    reports.into_iter().filter(is_safe_report).count()
+    reports
+        .into_iter()
+        .filter(|report: &Vec<i32>| is_safe_report(report))
+        .count()
 }
 
-fn part2(_path: &str) -> i32 {
-    0
+fn part2(path: &str) -> usize {
+    let reports = utils::rows_from_file::<i32>(path);
+    reports
+        .into_iter()
+        .filter(|report: &Vec<i32>| is_safe_report_with_damper(report))
+        .count()
 }
 
 #[cfg(test)]
@@ -55,6 +131,32 @@ mod tests {
 
     #[test]
     fn test_part2() {
-        assert!(part2("input/input02.txt.test1") == 0);
+        assert!(is_safe_report_with_damper(&vec![1, 3, 4, 5, 7]) == true);
+        assert!(is_safe_report_with_damper(&vec![8, 5, 4, 2, 1]) == true);
+        assert!(is_safe_report_with_damper(&vec![1, 3, 4, 3, 5]) == true);
+        assert!(is_safe_report_with_damper(&vec![7, 8, 4, 3, 1]) == true);
+        assert!(is_safe_report_with_damper(&vec![3, 4, 3, 2, 1]) == true);
+        assert!(is_safe_report_with_damper(&vec![4, 3, 2, 1, 3]) == true);
+        assert!(is_safe_report_with_damper(&vec![4, 3, 4, 3, 4]) == false);
+        assert!(part2("input/input02.txt.test1") == 4);
+    }
+
+    #[test]
+    fn test_part3() {
+        let report = vec![43, 46, 48, 49, 52, 49, 52, 49];
+        println!("{:?}", report);
+        for idx in 1..report.len() - 1 {
+            let left = &report[..idx];
+            let mid = &vec![report[idx - 1], report[idx + 1]];
+            let right = &report[idx + 1..];
+            println!("left: {:?}, mid: {:?}, right: {:?}", left, mid, right);
+            let left_type = report_type(left);
+            let right_needs_type = report_type(mid).combined_with(&left_type);
+            let right_type = report_type(right);
+            println!(
+                "left_type: {:?}, right_needs: {:?}, right_type: {:?}",
+                left_type, right_needs_type, right_type
+            );
+        }
     }
 }

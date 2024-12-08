@@ -140,23 +140,4 @@ mod tests {
         assert!(is_safe_report_with_damper(&vec![4, 3, 4, 3, 4]) == false);
         assert!(part2("input/input02.txt.test1") == 4);
     }
-
-    #[test]
-    fn test_part3() {
-        let report = vec![43, 46, 48, 49, 52, 49, 52, 49];
-        println!("{:?}", report);
-        for idx in 1..report.len() - 1 {
-            let left = &report[..idx];
-            let mid = &vec![report[idx - 1], report[idx + 1]];
-            let right = &report[idx + 1..];
-            println!("left: {:?}, mid: {:?}, right: {:?}", left, mid, right);
-            let left_type = report_type(left);
-            let right_needs_type = report_type(mid).combined_with(&left_type);
-            let right_type = report_type(right);
-            println!(
-                "left_type: {:?}, right_needs: {:?}, right_type: {:?}",
-                left_type, right_needs_type, right_type
-            );
-        }
-    }
 }

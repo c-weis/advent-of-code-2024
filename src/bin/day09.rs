@@ -1,4 +1,4 @@
-use std::cmp::min;
+use std::cmp;
 
 use itertools::Itertools;
 use rusty_advent_2024::utils::lines_from_file;
@@ -9,134 +9,106 @@ enum DataBlock {
     Free { size: usize },
 }
 
-#[derive(Debug)]
-struct DiskReaderStatus {
-    blocks: Vec<DataBlock>,
-    checksum: u128,
-    disk_position: u128,
-    left_block_idx: usize,
-    right_block_idx: usize,
-    left_block_tmp: Option<DataBlock>,
-    right_block_tmp: Option<DataBlock>,
+fn partial_checksum(id: usize, start_position: usize, size: usize) -> u128 {
+    (id * (start_position..start_position + size).sum::<usize>()) as u128
 }
 
-impl DiskReaderStatus {
-    fn from(blocks: Vec<DataBlock>) -> Self {
-        DiskReaderStatus {
-            checksum: 0,
-            disk_position: 0,
-            left_block_idx: 0,
-            right_block_idx: &blocks.len() - 1,
-            blocks,
+fn checksum(harddisk: &Vec<DataBlock>) -> u128 {
+    let mut checksum: u128 = 0;
+    let mut seeker: usize = 0;
 
-            // use _tmp blocks to keep track of
-            //  - partially filled Free Blocks on the left
-            //  - partially moved File Blocks on the right
-            left_block_tmp: None,
-            right_block_tmp: None,
-        }
-    }
-
-    fn left_block(&self) -> &DataBlock {
-        match &self.left_block_tmp {
-            Some(block) => block,
-            _ => &self.blocks[self.left_block_idx],
-        }
-    }
-
-    fn right_block(&self) -> &DataBlock {
-        match &self.right_block_tmp {
-            Some(block) => block,
-            _ => &self.blocks[self.right_block_idx],
-        }
-    }
-
-    fn advance_left_index(&mut self) {
-        self.left_block_idx += 1;
-        self.left_block_tmp = None;
-    }
-
-    fn advance_right_index(&mut self) {
-        self.right_block_idx -= 1;
-        self.right_block_tmp = None;
-    }
-
-    fn add_to_checksum(&mut self, id: &usize, size: &usize) {
-        self.checksum += partial_checksum(id, &self.disk_position, size) as u128;
-        self.disk_position += *size as u128;
-    }
-
-    fn simulate_moving_files(
-        &mut self,
-        &free_size: &usize,
-        &right_id: &usize,
-        &right_size: &usize,
-    ) {
-        let moved_files = min(free_size, right_size);
-        self.add_to_checksum(&right_id, &moved_files);
-
-        let new_free_size = free_size - moved_files;
-        if new_free_size == 0 {
-            self.advance_left_index();
-        } else {
-            self.left_block_tmp = Some(DataBlock::Free {
-                size: new_free_size,
-            });
-        }
-
-        let new_right_size = right_size - moved_files;
-        if new_right_size == 0 {
-            self.advance_right_index();
-        } else {
-            self.right_block_tmp = Some(DataBlock::File {
-                id: right_id,
-                size: new_right_size,
-            });
-        }
-    }
-
-    fn step(&mut self) {
-        match (self.left_block().clone(), self.right_block().clone()) {
-            // 1. file block on the left: add to checksum, advance left
-            (DataBlock::File { id, size }, right_block) => {
-                // special case: left block == right block
-                // block might already have partially moved
-                if self.left_block_idx == self.right_block_idx {
-                    if let DataBlock::File {
-                        id,
-                        size: actual_size,
-                    } = right_block
-                    {
-                        self.add_to_checksum(&id, &actual_size);
-                    }
-                } else {
-                    self.add_to_checksum(&id, &size);
-                }
-                self.advance_left_index();
+    for block in harddisk {
+        match block {
+            DataBlock::Free { size } => {
+                seeker += *size;
             }
-            // 2. free block on the right: advance right
-            (_, DataBlock::Free { size: _ }) => self.advance_right_index(),
-            // 3. free block on the left: simulate moving files from right by adding to checksum
+            DataBlock::File { id, size } => {
+                checksum += partial_checksum(*id, seeker, *size);
+                seeker += *size;
+            }
+        }
+    }
+
+    checksum
+}
+
+fn compressed(harddisk: &Vec<DataBlock>) -> Vec<DataBlock> {
+    // Part 1: right uber_block only ever has one component in it
+    let mut left_block_idx = 0;
+    let mut right_block_idx = &harddisk.len() - 1;
+    let mut compressed_harddisk: Vec<DataBlock> = Vec::new();
+
+    let mut free_space_in_left_block: Option<usize> = None;
+    let mut files_remaining_in_right_block: Option<usize> = None;
+    while left_block_idx < right_block_idx {
+        let (left_block, right_block) = (&harddisk[left_block_idx], &harddisk[right_block_idx]);
+
+        match (left_block, right_block) {
+            (_, DataBlock::Free { size: _ }) => right_block_idx -= 1,
+            (DataBlock::File { id, size }, _) => {
+                compressed_harddisk.push(DataBlock::File {
+                    id: *id,
+                    size: *size,
+                });
+                left_block_idx += 1;
+            }
             (
                 DataBlock::Free { size: free_size },
                 DataBlock::File {
-                    id: right_id,
-                    size: right_size,
+                    id: file_id,
+                    size: file_size,
                 },
-            ) => self.simulate_moving_files(&free_size, &right_id, &right_size),
+            ) => {
+                let free_size = match free_space_in_left_block {
+                    Some(free_size_left) => free_size_left,
+                    None => *free_size,
+                };
+                let file_size = match files_remaining_in_right_block {
+                    Some(file_size_right) => file_size_right,
+                    None => *file_size,
+                };
+
+                let movable_files = cmp::min(free_size, file_size);
+                let (new_free_size, new_file_size) =
+                    (free_size - movable_files, file_size - movable_files);
+
+                compressed_harddisk.push(DataBlock::File {
+                    id: *file_id,
+                    size: movable_files,
+                });
+
+                if new_free_size == 0 {
+                    left_block_idx += 1;
+                    free_space_in_left_block = None;
+                } else {
+                    free_space_in_left_block = Some(new_free_size);
+                }
+
+                if new_file_size == 0 {
+                    right_block_idx -= 1;
+                    files_remaining_in_right_block = None;
+                } else {
+                    files_remaining_in_right_block = Some(new_file_size);
+                }
+            }
         }
     }
 
-    fn total_checksum(&mut self) -> u128 {
-        while &self.right_block_idx >= &self.left_block_idx {
-            self.step();
+    if let Some(size_left) = files_remaining_in_right_block {
+        if let DataBlock::File { id, size: _ } = &harddisk[right_block_idx] {
+            compressed_harddisk.push(DataBlock::File {
+                id: *id,
+                size: size_left,
+            })
         }
-        self.checksum
+    } else if let DataBlock::File { id, size } = &harddisk[left_block_idx] {
+        compressed_harddisk.push(DataBlock::File {
+            id: *id,
+            size: *size,
+        });
     }
-}
 
-fn partial_checksum(&id: &usize, &start_position: &u128, &size: &usize) -> u128 {
-    id as u128 * (start_position..start_position + size as u128).sum::<u128>()
+    compressed_harddisk
 }
 
 fn blocks_from_string(string: String) -> Vec<DataBlock> {
@@ -169,9 +141,9 @@ fn part1(path: &str) -> u128 {
 
     let blocks = blocks_from_string(string);
 
-    let mut analyser = DiskReaderStatus::from(blocks);
+    let compressed_blocks = compressed(&blocks);
 
-    analyser.total_checksum()
+    checksum(&compressed_blocks)
 }
 
 fn part2(_path: &str) -> u128 {
@@ -184,32 +156,32 @@ mod tests {
 
     #[test]
     fn test_partial_checksum() {
-        assert!(partial_checksum(&7, &10, &5) == 7 * (10 + 11 + 12 + 13 + 14))
+        assert!(partial_checksum(7, 10, 5) == 7 * (10 + 11 + 12 + 13 + 14))
     }
 
     #[test]
     fn test_tiny_disks() {
         // "2": 00 -> 00
-        let mut analyser1 = DiskReaderStatus::from(blocks_from_string(String::from("2")));
-        assert!(analyser1.total_checksum() == 0);
+        let hdd1 = compressed(&blocks_from_string(String::from("2")));
+        assert!(checksum(&hdd1) == 0);
 
         // "232": 00...11 -> 0011...
-        let mut analyser2 = DiskReaderStatus::from(blocks_from_string(String::from("232")));
-        assert!(analyser2.total_checksum() == 5);
+        let hdd2 = compressed(&blocks_from_string(String::from("232")));
+        assert!(checksum(&hdd2) == 5);
 
         // "12345": 0..111....22222 -> 022111222.....
-        let mut analyser3 = DiskReaderStatus::from(blocks_from_string(String::from("12345")));
+        let hdd3 = compressed(&blocks_from_string(String::from("12345")));
         assert!(
-            analyser3.total_checksum()
-                == (partial_checksum(&0, &0, &1)
-                    + partial_checksum(&2, &1, &2)
-                    + partial_checksum(&1, &3, &3)
-                    + partial_checksum(&2, &6, &3)) as u128
+            checksum(&hdd3)
+                == (partial_checksum(0, 0, 1)
+                    + partial_checksum(2, 1, 2)
+                    + partial_checksum(1, 3, 3)
+                    + partial_checksum(2, 6, 3)) as u128
         );
 
         // "3132": 000.111.. -> 000111...
-        let mut analyser4 = DiskReaderStatus::from(blocks_from_string(String::from("3132")));
-        assert!(analyser4.total_checksum() == 3 + 4 + 5);
+        let hdd4 = compressed(&blocks_from_string(String::from("3132")));
+        assert!(checksum(&hdd4) == 3 + 4 + 5);
     }
 
     #[test]

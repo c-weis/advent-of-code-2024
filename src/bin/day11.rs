@@ -125,6 +125,6 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        assert!(part1("input/input11.txt.test1") == 36);
+        assert!(part1("input/input11.txt.test1") == 55312);
     }
 }

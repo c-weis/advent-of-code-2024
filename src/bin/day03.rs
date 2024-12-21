@@ -2,13 +2,6 @@ use itertools::Itertools;
 use regex::Regex;
 use rusty_advent_2024::utils::lines_from_file;
 
-fn main() {
-    println!("Answer to part 1:");
-    println!("{}", part1("input/input03.txt"));
-    println!("Answer to part 2:");
-    println!("{}", part2("input/input03.txt"));
-}
-
 fn compute_sum(row: &str) -> i32 {
     let pattern: Regex = Regex::new(r"mul\((\d{1,3}),(\d{1,3})\)").expect("Regex pattern invalid.");
     pattern
@@ -48,9 +41,16 @@ fn part2(path: &str) -> i32 {
     // Remove anything from don't() to either do() or the string end
     let dont_mul_pattern: Regex =
         Regex::new(r"don\'t\(\).*?(?:do\(\)|$)").expect("Regex pattern invalid.");
-    let enbaled_instructions = dont_mul_pattern.replace_all(&total_string, "");
+    let enabled_instructions = dont_mul_pattern.replace_all(&total_string, "");
 
-    compute_sum(&enbaled_instructions)
+    compute_sum(&enabled_instructions)
+}
+
+fn main() {
+    println!("Answer to part 1:");
+    println!("{}", part1("input/input03.txt"));
+    println!("Answer to part 2:");
+    println!("{}", part2("input/input03.txt"));
 }
 
 #[cfg(test)]
@@ -58,10 +58,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_part1() {
+    fn test_compute_sum() {
         assert!(compute_sum("mul(100,002)") == 200);
         assert!(compute_sum("mul (100,002)lkdsjflshalasjf") == 0);
         assert!(compute_sum("mul(mul(10,7)40,200)mul(10,3)") == 100);
+    }
+
+    #[test]
+    fn test_part1() {
         assert!(part1("input/input03.txt.test1") == 161);
     }
 

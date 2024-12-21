@@ -28,13 +28,6 @@ impl ReportType {
     }
 }
 
-fn main() {
-    println!("Answer to part 1:");
-    println!("{}", part1("input/input02.txt"));
-    println!("Answer to part 2:");
-    println!("{}", part2("input/input02.txt"));
-}
-
 fn is_safe_increase(difference: i32) -> bool {
     match difference {
         1 | 2 | 3 => true,
@@ -113,6 +106,13 @@ fn part2(path: &str) -> usize {
         .into_iter()
         .filter(|report: &Vec<i32>| is_safe_report_with_damper(report))
         .count()
+}
+
+fn main() {
+    println!("Answer to part 1:");
+    println!("{}", part1("input/input02.txt"));
+    println!("Answer to part 2:");
+    println!("{}", part2("input/input02.txt"));
 }
 
 #[cfg(test)]

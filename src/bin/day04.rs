@@ -1,41 +1,57 @@
-use itertools::Itertools;
-use rusty_advent_2024::utils::lines_from_file;
+use std::str::Chars;
 
-fn main() {
-    println!("Answer to part 1:");
-    println!("{}", part1("input/input04.txt"));
-    println!("Answer to part 2:");
-    println!("{}", part2("input/input04.txt"));
+use itertools::Itertools;
+use rusty_advent_2024::maps::*;
+use rusty_advent_2024::utils;
+
+type Puzzle = Map2D<char>;
+
+#[derive(Clone, Copy)]
+struct StraightLine {
+    start_pos: Position,
+    dir: (i32, i32),
+    len: usize,
 }
 
-fn matches_word(haystack: &Vec<Vec<u8>>, indices: &Vec<(i32, i32)>, subword: &[u8]) -> bool {
-    let w = haystack[0].len() as i32;
-    let h = haystack.len() as i32;
-    indices.iter().enumerate().all(|(subword_idx, (x, y))| {
-        *x >= 0
-            && *x <= w - 1
-            && *y >= 0
-            && *y <= h - 1
-            && haystack[*y as usize][*x as usize] == subword[subword_idx]
+impl Iterator for StraightLine {
+    type Item = Position;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.len == 0 {
+            return None;
+        }
+        let pos = self.start_pos;
+        self.start_pos = Position(pos.0 + self.dir.0, pos.1 + self.dir.1);
+        self.len -= 1;
+        Some(pos)
+    }
+}
+
+fn matches_word(
+    puzzle: &Puzzle,
+    positions: impl Iterator<Item = Position>,
+    subword: Chars,
+) -> bool {
+    positions.zip(subword).all(|(pos, c)| -> bool {
+        pos.in_bounds(&puzzle.bounds)
+            .is_some_and(|valid_pos| *puzzle.value(&valid_pos) == c)
     })
 }
 
-fn find_x_mas(haystack: &Vec<Vec<u8>>, a_coord: (i32, i32)) -> bool {
-    let (a_x, a_y) = a_coord;
-    let diag1 = vec![(a_x - 1, a_y - 1), (a_x + 1, a_y + 1)];
-    let diag2 = vec![(a_x - 1, a_y + 1), (a_x + 1, a_y - 1)];
+fn find_x_mas(puzzle: &Puzzle, &pos_a: &ValidPosition) -> bool {
+    let Position(a_x, a_y) = pos_a.into();
+    let diag1 = vec![Position(a_x - 1, a_y - 1), Position(a_x + 1, a_y + 1)];
+    let diag2 = vec![Position(a_x - 1, a_y + 1), Position(a_x + 1, a_y - 1)];
 
-    haystack[a_y as usize][a_x as usize] == b'A'
-        && (matches_word(haystack, &diag1, "MS".as_bytes())
-            || matches_word(haystack, &diag1, "SM".as_bytes()))
-        && (matches_word(haystack, &diag2, "MS".as_bytes())
-            || matches_word(haystack, &diag2, "SM".as_bytes()))
+    *(puzzle.value(&pos_a)) == 'A'
+        && (matches_word(&puzzle, diag1.clone().into_iter(), "MS".chars())
+            || matches_word(&puzzle, diag1.into_iter(), "SM".chars()))
+        && (matches_word(&puzzle, diag2.clone().into_iter(), "MS".chars())
+            || matches_word(&puzzle, diag2.into_iter(), "SM".chars()))
 }
 
 fn part1(path: &str) -> usize {
-    let puzzle = lines_from_file(path)
-        .map(|line| line.unwrap().as_bytes().to_vec())
-        .collect_vec();
+    let puzzle: Puzzle = utils::lines_from_file(path).into();
     let directions: Vec<(i32, i32)> = vec![
         (-1, -1),
         (-1, 0),
@@ -47,45 +63,35 @@ fn part1(path: &str) -> usize {
         (1, 1),
     ];
 
-    let w = puzzle[0].len() as i32;
-    let h = puzzle[1].len() as i32;
-
-    (0..w)
-        .map(|x| -> usize {
-            (0..h)
-                .map(|y| -> usize {
-                    directions
-                        .iter()
-                        .filter(|&&(dx, dy)| {
-                            let indices = vec![
-                                (x, y),
-                                (x + dx, y + dy),
-                                (x + 2 * dx, y + 2 * dy),
-                                (x + 3 * dx, y + 3 * dy),
-                            ];
-                            matches_word(&puzzle, &indices, "XMAS".as_bytes())
-                        })
-                        .count()
-                })
-                .sum()
+    puzzle
+        .position_iter()
+        .map(Into::into)
+        .cartesian_product(directions)
+        .map(|(pos, dir)| -> StraightLine {
+            // search all straight lines of length 4
+            StraightLine {
+                start_pos: pos,
+                dir,
+                len: 4,
+            }
         })
-        .sum()
+        .filter(|line| matches_word(&puzzle, line.into_iter(), "XMAS".chars()))
+        .count()
 }
 
 fn part2(path: &str) -> usize {
-    let puzzle = lines_from_file(path)
-        .map(|line| line.unwrap().as_bytes().to_vec())
-        .collect_vec();
+    let puzzle: Puzzle = utils::lines_from_file(path).into();
+    puzzle
+        .position_iter()
+        .filter(|pos| -> bool { find_x_mas(&puzzle, pos) })
+        .count()
+}
 
-    let w = puzzle[0].len() as i32;
-    let h = puzzle[1].len() as i32;
-    (1..w - 1)
-        .map(|x| -> usize {
-            (1..h - 1)
-                .filter(|&y| -> bool { find_x_mas(&puzzle, (x, y)) })
-                .count()
-        })
-        .sum()
+fn main() {
+    println!("Answer to part 1:");
+    println!("{}", part1("input/input04.txt"));
+    println!("Answer to part 2:");
+    println!("{}", part2("input/input04.txt"));
 }
 
 #[cfg(test)]

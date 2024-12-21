@@ -2,13 +2,6 @@ use rusty_advent_2024::utils;
 
 use itertools::Itertools;
 
-fn main() {
-    println!("Answer to part 1:");
-    println!("{}", part1("input/input01.txt"));
-    println!("Answer to part 2:");
-    println!("{}", part2("input/input01.txt"));
-}
-
 fn part1(path: &str) -> i32 {
     let (mut v1, mut v2) = utils::two_columns_from_file::<i32>(path);
     v1.sort();
@@ -29,6 +22,13 @@ fn part2(path: &str) -> i32 {
             number * *occurrences1 as i32 * *freq2.get(number).unwrap_or(&0) as i32
         })
         .sum()
+}
+
+fn main() {
+    println!("Answer to part 1:");
+    println!("{}", part1("input/input01.txt"));
+    println!("Answer to part 2:");
+    println!("{}", part2("input/input01.txt"));
 }
 
 #[cfg(test)]

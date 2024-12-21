@@ -270,5 +270,13 @@ pub mod maps {
                 Direction::LEFT => Position(*x - 1, *y),
             }
         }
+
+        pub fn mirrored_across(&self, other: &Self) -> Self {
+            Position(2 * other.0 - self.0, 2 * other.1 - self.1)
+        }
+
+        pub fn plus(self, (x, y): (i32, i32)) -> Position {
+            Position(self.0 + x, self.1 + y)
+        }
     }
 }

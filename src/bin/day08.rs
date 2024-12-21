@@ -1,42 +1,40 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    ops::{Deref, DerefMut},
+};
 
-use rusty_advent_2024::utils::lines_from_file;
+use itertools::Itertools;
+use rusty_advent_2024::{maps::*, utils};
 
-#[derive(Hash, PartialEq, Eq, Clone, Copy, Debug)]
-struct Position(i32, i32);
-#[derive(Debug)]
-struct Bounds(usize, usize);
-
-#[derive(Debug)]
 struct Antenna {
-    frequency: u8,
+    frequency: char,
     pos: Position,
 }
 
-#[derive(Debug)]
-struct AntennaMap(HashMap<u8, HashSet<Position>>);
+struct AntennaMap(HashMap<char, HashSet<Position>>);
 
-impl Position {
-    fn mirrored_across(&self, other: &Self) -> Self {
-        Position(2 * other.0 - self.0, 2 * other.1 - self.1)
+// implemented bc I want AntennaMap to *be* a HashMap
+impl Deref for AntennaMap {
+    type Target = HashMap<char, HashSet<Position>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
+}
 
-    fn in_bounds(&self, bounds: &Bounds) -> bool {
-        self.0 >= 0 && self.1 >= 0 && self.0 < bounds.0 as i32 && self.1 < bounds.1 as i32
-    }
-
-    fn plus(self, (x, y): (i32, i32)) -> Position {
-        Position(self.0 + x, self.1 + y)
+// implemented bc I want AntennaMap to *be* a HashMap
+impl DerefMut for AntennaMap {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
 
 impl AntennaMap {
     fn add(&mut self, antenna: Antenna) {
-        if let Some(positions) = self.0.get_mut(&antenna.frequency) {
+        if let Some(positions) = self.get_mut(&antenna.frequency) {
             positions.insert(antenna.pos);
         } else {
-            self.0
-                .insert(antenna.frequency, HashSet::from([antenna.pos]));
+            self.insert(antenna.frequency, HashSet::from([antenna.pos]));
         }
     }
 
@@ -45,17 +43,16 @@ impl AntennaMap {
     }
 }
 
-#[derive(Debug)]
 struct City {
     bounds: Bounds,
     antenna_map: AntennaMap,
 }
 
 impl City {
-    fn basic_antinodes(self) -> HashSet<Position> {
-        let mut antinodes: HashSet<Position> = HashSet::new();
+    fn basic_antinodes(self) -> HashSet<ValidPosition> {
+        let mut antinodes: HashSet<ValidPosition> = HashSet::new();
 
-        for position_list in self.antenna_map.0.values() {
+        for position_list in self.antenna_map.values() {
             for pos1 in position_list {
                 for pos2 in position_list {
                     if pos1 == pos2 {
@@ -63,8 +60,8 @@ impl City {
                     }
 
                     let antinode = pos1.mirrored_across(pos2);
-                    if antinode.in_bounds(&self.bounds) {
-                        antinodes.insert(antinode);
+                    if let Some(pos) = antinode.in_bounds(&self.bounds) {
+                        antinodes.insert(pos);
                     }
                 }
             }
@@ -73,30 +70,49 @@ impl City {
         antinodes
     }
 
-    fn harmonic_antinodes(self) -> HashSet<Position> {
-        let mut antinodes: HashSet<Position> = HashSet::new();
+    fn harmonic_antinodes(self) -> HashSet<ValidPosition> {
+        let mut antinodes: HashSet<ValidPosition> = HashSet::new();
 
-        for position_list in self.antenna_map.0.values() {
-            for pos1 in position_list {
-                for pos2 in position_list {
-                    if pos1 == pos2 {
-                        continue;
-                    }
+        for position_list in self.antenna_map.values() {
+            let position_iter = position_list.iter();
+            for (pos1, pos2) in position_iter.clone().cartesian_product(position_iter) {
+                if pos1 == pos2 {
+                    continue;
+                }
 
-                    let (dx, dy) = (pos2.0 - pos1.0, pos2.1 - pos1.1);
-                    let gcd = gcd(dx.abs() as usize, dy.abs() as usize) as i32;
-                    let (dx, dy) = (dx / gcd, dy / gcd);
+                let (dx, dy) = (pos2.0 - pos1.0, pos2.1 - pos1.1);
+                let gcd = gcd(dx.abs() as usize, dy.abs() as usize) as i32;
+                let (dx, dy) = (dx / gcd, dy / gcd);
 
-                    let mut antinode = *pos1; 
-                    while antinode.in_bounds(&self.bounds) {
-                        antinodes.insert(antinode.clone());
-                        antinode = antinode.plus((dx, dy));
-                    } 
+                let mut antinode = pos1.clone();
+                while let Some(pos) = antinode.in_bounds(&self.bounds) {
+                    antinodes.insert(pos.clone());
+                    antinode = antinode.plus((dx, dy));
                 }
             }
         }
 
         antinodes
+    }
+}
+
+impl From<Map2D<char>> for City {
+    fn from(map: Map2D<char>) -> Self {
+        let mut antenna_map = AntennaMap::new();
+        for pos in map.position_iter() {
+            match map.value(&pos) {
+                '.' => (),
+                c => antenna_map.add(Antenna {
+                    frequency: *c,
+                    pos: pos.into(),
+                }),
+            };
+        }
+
+        City {
+            bounds: map.bounds,
+            antenna_map,
+        }
     }
 }
 
@@ -107,46 +123,26 @@ fn gcd(a: usize, b: usize) -> usize {
     }
 }
 
-fn main() {
-    println!("Answer to part 1:");
-    println!("{}", part1("input/input08.txt"));
-    println!("Answer to part 2:");
-    println!("{}", part2("input/input08.txt"));
-}
-
 fn scan_city(path: &str) -> City {
-    let mut antennae = AntennaMap::new();
-    let mut bounds: Bounds = Bounds(0, 0);
-    for (y, line) in lines_from_file(path).into_iter().enumerate() {
-        for (x, c) in line.unwrap().as_bytes().iter().enumerate() {
-            match *c {
-                b'.' => {}
-                _ => antennae.add(Antenna {
-                    frequency: *c,
-                    pos: Position(x as i32, y as i32),
-                }),
-            };
-
-            bounds = Bounds(x + 1, y + 1);
-        }
-    }
-
-    City {
-        bounds,
-        antenna_map: antennae,
-    }
+    let map: Map2D<char> = Map2D::from(utils::lines_from_file(path));
+    City::from(map)
 }
 
 fn part1(path: &str) -> usize {
     let city = scan_city(path);
-
     city.basic_antinodes().len()
 }
 
 fn part2(path: &str) -> usize {
     let city = scan_city(path);
-
     city.harmonic_antinodes().len()
+}
+
+fn main() {
+    println!("Answer to part 1:");
+    println!("{}", part1("input/input08.txt"));
+    println!("Answer to part 2:");
+    println!("{}", part2("input/input08.txt"));
 }
 
 #[cfg(test)]

@@ -247,6 +247,18 @@ pub mod maps {
         }
     }
 
+    impl From<char> for Direction {
+        fn from(character: char) -> Self {
+            match character {
+                '^' => Direction::UP,
+                '>' => Direction::RIGHT,
+                'v' => Direction::DOWN,
+                '<' => Direction::LEFT,
+                _ => panic!("Invalid character {character} specified to create Direction."),
+            }
+        }
+    }
+
     impl Position {
         pub fn step(&self, direction: &Direction) -> Position {
             let Position(x, y) = self;

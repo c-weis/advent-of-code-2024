@@ -1,53 +1,7 @@
 use std::{collections::HashSet, hash::Hash};
 
+use rusty_advent_2024::maps::*;
 use rusty_advent_2024::utils::lines_from_file;
-
-#[derive(Hash, PartialEq, Eq, Clone, Copy)]
-struct Position(i32, i32);
-
-struct Bounds(usize, usize);
-
-#[derive(Hash, PartialEq, Eq, Clone, Copy)]
-enum Direction {
-    UP,
-    RIGHT,
-    DOWN,
-    LEFT,
-}
-
-impl Direction {
-    fn from(character: &u8) -> Self {
-        match character {
-            b'^' => Direction::UP,
-            b'>' => Direction::RIGHT,
-            b'v' => Direction::DOWN,
-            b'<' => Direction::LEFT,
-            _ => panic!("Invalid character {character} specified to create Direction."),
-        }
-    }
-
-    fn rotate(self: &mut Self) {
-        *self = match self {
-            Self::UP => Self::RIGHT,
-            Self::RIGHT => Self::DOWN,
-            Self::DOWN => Self::LEFT,
-            Self::LEFT => Self::UP,
-        };
-    }
-}
-
-impl Position {
-    fn step(&self, direction: &Direction) -> Position {
-        let Position(x, y) = self;
-
-        match direction {
-            Direction::UP => Position(*x, *y - 1),
-            Direction::RIGHT => Position(*x + 1, *y),
-            Direction::DOWN => Position(*x, *y + 1),
-            Direction::LEFT => Position(*x - 1, *y),
-        }
-    }
-}
 
 #[derive(Hash, PartialEq, Eq, Clone, Copy)]
 struct Guard {
@@ -67,7 +21,7 @@ impl MazeState {
         let next_pos = self.guard.pos.step(&self.guard.dir);
 
         if self.obstacles.contains(&next_pos) {
-            self.guard.dir.rotate();
+            self.guard.dir.turn_right();
             return Some(self.guard.pos.clone());
         }
 
@@ -86,13 +40,6 @@ struct MazeState {
     bounds: Bounds,
 }
 
-fn main() {
-    println!("Answer to part 1:");
-    println!("{}", part1("input/input06.txt"));
-    println!("Answer to part 2:");
-    println!("{}", part2("input/input06.txt"));
-}
-
 fn read_maze(path: &str) -> MazeState {
     let mut guard: Guard = Guard {
         pos: Position(0, 0),
@@ -101,20 +48,19 @@ fn read_maze(path: &str) -> MazeState {
     let mut obstacles: HashSet<Position> = HashSet::new();
     let mut bounds: Bounds = Bounds(0, 0);
     for (y, line) in lines_from_file(path).into_iter().enumerate() {
-        for (x, c) in line.unwrap().as_bytes().iter().enumerate() {
-            match *c {
-                b'#' => {
+        for (x, c) in line.unwrap().chars().enumerate() {
+            match c {
+                '#' => {
                     obstacles.insert(Position(x as i32, y as i32));
                 }
-                b'^' | b'>' | b'v' | b'<' => {
+                '^' | '>' | 'v' | '<' => {
                     guard = Guard {
                         pos: Position(x as i32, y as i32),
-                        dir: Direction::from(c),
+                        dir: c.into(),
                     }
                 }
                 _ => {}
             }
-
             bounds = Bounds(x + 1, y + 1);
         }
     }
@@ -174,6 +120,13 @@ fn part2(path: &str) -> usize {
         .iter()
         .filter(|&&obstacle| creates_loop(&mut maze, obstacle))
         .count()
+}
+
+fn main() {
+    println!("Answer to part 1:");
+    println!("{}", part1("input/input06.txt"));
+    println!("Answer to part 2:");
+    println!("{}", part2("input/input06.txt"));
 }
 
 #[cfg(test)]

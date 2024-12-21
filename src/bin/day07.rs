@@ -58,13 +58,6 @@ fn equations_from_file(path: &str) -> Vec<Equation> {
         .collect_vec()
 }
 
-fn main() {
-    println!("Answer to part 1:");
-    println!("{}", part1("input/input07.txt"));
-    println!("Answer to part 2:");
-    println!("{}", part2("input/input07.txt"));
-}
-
 fn part1(path: &str) -> usize {
     let equations = equations_from_file(path);
     equations
@@ -85,6 +78,13 @@ fn part2(path: &str) -> usize {
         })
         .map(|Equation { target, numbers: _ }| target)
         .sum()
+}
+
+fn main() {
+    println!("Answer to part 1:");
+    println!("{}", part1("input/input07.txt"));
+    println!("Answer to part 2:");
+    println!("{}", part2("input/input07.txt"));
 }
 
 #[cfg(test)]

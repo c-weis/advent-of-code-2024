@@ -6,13 +6,6 @@ use rusty_advent_2024::utils::lines_from_file;
 type RuleSet = HashMap<usize, HashSet<usize>>;
 type Update = Vec<usize>;
 
-fn main() {
-    println!("Answer to part 1:");
-    println!("{}", part1("input/input05.txt"));
-    println!("Answer to part 2:");
-    println!("{}", part2("input/input05.txt"));
-}
-
 fn update_rule(rules: &mut RuleSet, key: usize, value: usize) {
     if let Some(values) = rules.get_mut(&key) {
         values.insert(value);
@@ -120,6 +113,13 @@ fn part2(path: &str) -> usize {
             middle_page(update)
         })
         .sum()
+}
+
+fn main() {
+    println!("Answer to part 1:");
+    println!("{}", part1("input/input05.txt"));
+    println!("Answer to part 2:");
+    println!("{}", part2("input/input05.txt"));
 }
 
 #[cfg(test)]

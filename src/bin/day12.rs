@@ -3,13 +3,6 @@ use rusty_advent_2024::utils;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-fn main() {
-    println!("Answer to part 1:");
-    println!("{}", part1("input/input12.txt"));
-    println!("Answer to part 2:");
-    println!("{}", part2("input/input12.txt"));
-}
-
 type Plant = char;
 type Field = Map2D<Plant>;
 #[derive(Debug)]
@@ -125,6 +118,13 @@ fn part2(path: &str) -> usize {
         .iter()
         .map(|plot| -> usize { plot.area() * plot.sides() })
         .sum()
+}
+
+fn main() {
+    println!("Answer to part 1:");
+    println!("{}", part1("input/input12.txt"));
+    println!("Answer to part 2:");
+    println!("{}", part2("input/input12.txt"));
 }
 
 #[cfg(test)]

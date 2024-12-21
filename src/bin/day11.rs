@@ -86,13 +86,6 @@ fn blink_list(stone_list: StoneList) -> StoneList {
         .collect()
 }
 
-fn main() {
-    println!("Answer to part 1:");
-    println!("{}", part1("input/input11.txt"));
-    println!("Answer to part 2:");
-    println!("{}", part2("input/input11.txt"));
-}
-
 fn part1(path: &str) -> usize {
     let mut stone_list: StoneList = stone_list_from_file(path);
     for _ in 1..=25 {
@@ -109,6 +102,13 @@ fn part2(path: &str) -> usize {
     }
 
     stone_map.values().sum()
+}
+
+fn main() {
+    println!("Answer to part 1:");
+    println!("{}", part1("input/input11.txt"));
+    println!("Answer to part 2:");
+    println!("{}", part2("input/input11.txt"));
 }
 
 #[cfg(test)]

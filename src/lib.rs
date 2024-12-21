@@ -52,6 +52,7 @@ pub mod maps {
         collections::{HashSet, VecDeque},
         hash::Hash,
         io::{BufRead, Lines},
+        ops::{Add, Div, Mul, Sub},
     };
 
     pub trait HasCharConverter {
@@ -75,6 +76,9 @@ pub mod maps {
         pub data: Vec<Vec<T>>,
         pub bounds: Bounds,
     }
+
+    #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+    pub struct IntVec2D(pub i32, pub i32);
 
     #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
     pub struct Position(pub i32, pub i32);
@@ -275,8 +279,60 @@ pub mod maps {
             Position(2 * other.0 - self.0, 2 * other.1 - self.1)
         }
 
-        pub fn plus(self, (x, y): (i32, i32)) -> Position {
+        pub fn add(self, IntVec2D(x, y): &IntVec2D) -> Self {
             Position(self.0 + x, self.1 + y)
+        }
+    }
+
+    impl Add<IntVec2D> for Position {
+        type Output = Position;
+
+        fn add(self, rhs: IntVec2D) -> Self::Output {
+            Position(self.0 + rhs.0, self.1 + rhs.1)
+        }
+    }
+
+    impl Sub<Self> for Position {
+        type Output = IntVec2D;
+        fn sub(self, rhs: Self) -> Self::Output {
+            IntVec2D(self.0 - rhs.0, self.1 - rhs.1)
+        }
+    }
+
+    impl Sub<IntVec2D> for Position {
+        type Output = Position;
+        fn sub(self, rhs: IntVec2D) -> Self::Output {
+            Position(self.0 - rhs.0, self.1 - rhs.1)
+        }
+    }
+
+    impl Add<IntVec2D> for IntVec2D {
+        type Output = IntVec2D;
+        fn add(self, rhs: IntVec2D) -> Self::Output {
+            IntVec2D(self.0 + rhs.0, self.1 + rhs.1)
+        }
+    }
+
+    impl Sub<IntVec2D> for IntVec2D {
+        type Output = IntVec2D;
+        fn sub(self, rhs: IntVec2D) -> Self::Output {
+            IntVec2D(self.0 - rhs.0, self.1 - rhs.1)
+        }
+    }
+
+    impl Mul<i32> for IntVec2D {
+        type Output = IntVec2D;
+    
+        fn mul(self, rhs: i32) -> Self::Output {
+            IntVec2D(self.0 * rhs, self.1 * rhs)
+        }
+    }
+
+    impl Div<i32> for IntVec2D {
+        type Output = IntVec2D;
+    
+        fn div(self, rhs: i32) -> Self::Output {
+            IntVec2D(self.0 / rhs, self.1 / rhs)
         }
     }
 }

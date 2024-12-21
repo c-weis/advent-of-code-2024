@@ -80,14 +80,14 @@ impl City {
                     continue;
                 }
 
-                let (dx, dy) = (pos2.0 - pos1.0, pos2.1 - pos1.1);
-                let gcd = gcd(dx.abs() as usize, dy.abs() as usize) as i32;
-                let (dx, dy) = (dx / gcd, dy / gcd);
+                let distance = *pos2 - *pos1;
+                let gcd = gcd(distance.0.abs() as usize, distance.1.abs() as usize) as i32;
+                let delta = distance / gcd;
 
                 let mut antinode = pos1.clone();
                 while let Some(pos) = antinode.in_bounds(&self.bounds) {
                     antinodes.insert(pos.clone());
-                    antinode = antinode.plus((dx, dy));
+                    antinode = antinode + delta;
                 }
             }
         }

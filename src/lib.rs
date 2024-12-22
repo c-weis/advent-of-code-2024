@@ -48,6 +48,7 @@ pub mod utils {
 
 pub mod maps {
     use itertools::Itertools;
+    use num::Integer;
     use std::{
         collections::{HashSet, VecDeque},
         hash::Hash,
@@ -78,7 +79,7 @@ pub mod maps {
     }
 
     #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
-    pub struct IntVec2D(pub i32, pub i32);
+    pub struct IntVec2D<T: Integer>(pub T, pub T);
 
     #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
     pub struct Position(pub i32, pub i32);
@@ -92,6 +93,18 @@ pub mod maps {
     impl From<(usize, usize)> for ValidPosition {
         fn from((x, y): (usize, usize)) -> ValidPosition {
             ValidPosition(x, y)
+        }
+    }
+
+    impl From<(i32, i32)> for Position {
+        fn from((x, y): (i32, i32)) -> Self {
+            Position(x, y)
+        }
+    }
+
+    impl<T: Integer + From<i32>> From<(i32, i32)> for IntVec2D<T> {
+        fn from((x, y): (i32, i32)) -> Self {
+            IntVec2D(x.into(), y.into())
         }
     }
 
@@ -279,60 +292,76 @@ pub mod maps {
             Position(2 * other.0 - self.0, 2 * other.1 - self.1)
         }
 
-        pub fn add(self, IntVec2D(x, y): &IntVec2D) -> Self {
+        pub fn add(self, IntVec2D(x, y): &IntVec2D<i32>) -> Self {
             Position(self.0 + x, self.1 + y)
         }
     }
 
-    impl Add<IntVec2D> for Position {
+    impl Add<IntVec2D<i32>> for Position {
         type Output = Position;
 
-        fn add(self, rhs: IntVec2D) -> Self::Output {
+        fn add(self, rhs: IntVec2D<i32>) -> Self::Output {
             Position(self.0 + rhs.0, self.1 + rhs.1)
         }
     }
 
     impl Sub<Self> for Position {
-        type Output = IntVec2D;
+        type Output = IntVec2D<i32>;
         fn sub(self, rhs: Self) -> Self::Output {
             IntVec2D(self.0 - rhs.0, self.1 - rhs.1)
         }
     }
 
-    impl Sub<IntVec2D> for Position {
+    impl Sub<IntVec2D<i32>> for Position {
         type Output = Position;
-        fn sub(self, rhs: IntVec2D) -> Self::Output {
+        fn sub(self, rhs: IntVec2D<i32>) -> Self::Output {
             Position(self.0 - rhs.0, self.1 - rhs.1)
         }
     }
 
-    impl Add<IntVec2D> for IntVec2D {
-        type Output = IntVec2D;
-        fn add(self, rhs: IntVec2D) -> Self::Output {
+    impl<T: Integer> Add<IntVec2D<T>> for IntVec2D<T> {
+        type Output = IntVec2D<T>;
+        fn add(self, rhs: IntVec2D<T>) -> Self::Output {
             IntVec2D(self.0 + rhs.0, self.1 + rhs.1)
         }
     }
 
-    impl Sub<IntVec2D> for IntVec2D {
-        type Output = IntVec2D;
-        fn sub(self, rhs: IntVec2D) -> Self::Output {
+    impl<T: Integer> Sub<IntVec2D<T>> for IntVec2D<T> {
+        type Output = IntVec2D<T>;
+        fn sub(self, rhs: IntVec2D<T>) -> Self::Output {
             IntVec2D(self.0 - rhs.0, self.1 - rhs.1)
         }
     }
 
-    impl Mul<i32> for IntVec2D {
-        type Output = IntVec2D;
-    
-        fn mul(self, rhs: i32) -> Self::Output {
+    impl<T: Integer + Copy> Mul<T> for IntVec2D<T> {
+        type Output = IntVec2D<T>;
+
+        fn mul(self, rhs: T) -> Self::Output {
             IntVec2D(self.0 * rhs, self.1 * rhs)
         }
     }
 
-    impl Div<i32> for IntVec2D {
-        type Output = IntVec2D;
-    
-        fn div(self, rhs: i32) -> Self::Output {
+    impl<T: Integer + Copy> Div<T> for IntVec2D<T> {
+        type Output = IntVec2D<T>;
+
+        fn div(self, rhs: T) -> Self::Output {
             IntVec2D(self.0 / rhs, self.1 / rhs)
+        }
+    }
+
+    impl<T: Integer + Copy> IntVec2D<T> {
+        pub fn dot(self, rhs: IntVec2D<T>) -> T {
+            self.0 * rhs.0 + self.1 * rhs.1
+        }
+
+        pub fn norm_sq(self) -> T {
+            self.0 * self.0 + self.1 * self.1
+        }
+    }
+
+    impl Into<Position> for IntVec2D<i32> {
+        fn into(self) -> Position {
+            Position(self.0, self.1)
         }
     }
 }

@@ -1,10 +1,13 @@
-use rusty_advent_2024::maps::*;
-use rusty_advent_2024::utils;
+use itertools::Itertools;
+use rusty_advent_2024::utils::file_io;
+use rusty_advent_2024::utils::map2d::direction::Direction;
+use rusty_advent_2024::utils::map2d::grid::Grid;
+use rusty_advent_2024::utils::map2d::position::Position;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
 type Plant = char;
-type Field = Map2D<Plant>;
+type Field = Grid<Plant>;
 #[derive(Debug)]
 struct Plot {
     _plant_type: char,
@@ -103,7 +106,7 @@ fn find_plots(field: &Field) -> Vec<Plot> {
 }
 
 fn part1(path: &str) -> usize {
-    let field: Field = Map2D::from(utils::lines_from_file(path));
+    let field: Field = Grid::from(file_io::strings_from_file(path).collect_vec());
     let plots: Vec<Plot> = find_plots(&field);
     plots
         .iter()
@@ -112,7 +115,7 @@ fn part1(path: &str) -> usize {
 }
 
 fn part2(path: &str) -> usize {
-    let field: Field = Map2D::from(utils::lines_from_file(path));
+    let field: Field = Grid::from(file_io::strings_from_file(path).collect_vec());
     let plots: Vec<Plot> = find_plots(&field);
     plots
         .iter()

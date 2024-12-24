@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use rusty_advent_2024::utils::lines_from_file;
+use rusty_advent_2024::utils::file_io::lines_from_file;
 
 struct Equation {
     target: usize,

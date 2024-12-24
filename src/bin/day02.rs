@@ -1,4 +1,4 @@
-use rusty_advent_2024::utils;
+use rusty_advent_2024::utils::file_io;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 enum ReportType {
@@ -93,7 +93,7 @@ fn is_safe_report_with_damper(report: &[i32]) -> bool {
 }
 
 fn part1(path: &str) -> usize {
-    let reports = utils::rows_from_file::<i32>(path);
+    let reports = file_io::rows_from_file::<i32>(path);
     reports
         .into_iter()
         .filter(|report: &Vec<i32>| is_safe_report(report))
@@ -101,7 +101,7 @@ fn part1(path: &str) -> usize {
 }
 
 fn part2(path: &str) -> usize {
-    let reports = utils::rows_from_file::<i32>(path);
+    let reports = file_io::rows_from_file::<i32>(path);
     reports
         .into_iter()
         .filter(|report: &Vec<i32>| is_safe_report_with_damper(report))

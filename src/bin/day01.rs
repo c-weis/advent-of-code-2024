@@ -1,9 +1,8 @@
-use rusty_advent_2024::utils;
-
 use itertools::Itertools;
+use rusty_advent_2024::utils::file_io;
 
 fn part1(path: &str) -> i32 {
-    let (mut v1, mut v2) = utils::two_columns_from_file::<i32>(path);
+    let (mut v1, mut v2) = file_io::two_columns_from_file::<i32>(path);
     v1.sort();
     v2.sort();
     v1.into_iter()
@@ -13,7 +12,7 @@ fn part1(path: &str) -> i32 {
 }
 
 fn part2(path: &str) -> i32 {
-    let (v1, v2) = utils::two_columns_from_file::<i32>(path);
+    let (v1, v2) = file_io::two_columns_from_file::<i32>(path);
     let freq1 = v1.into_iter().counts();
     let freq2 = v2.into_iter().counts();
     freq1

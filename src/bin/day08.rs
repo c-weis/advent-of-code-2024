@@ -1,10 +1,15 @@
+use itertools::Itertools;
+use rusty_advent_2024::utils::{
+    file_io,
+    map2d::{
+        grid::{Bounds, Grid, ValidPosition},
+        position::Position,
+    },
+};
 use std::{
     collections::{HashMap, HashSet},
     ops::{Deref, DerefMut},
 };
-
-use itertools::Itertools;
-use rusty_advent_2024::{maps::*, utils};
 
 struct Antenna {
     frequency: char,
@@ -96,8 +101,8 @@ impl City {
     }
 }
 
-impl From<Map2D<char>> for City {
-    fn from(map: Map2D<char>) -> Self {
+impl From<Grid<char>> for City {
+    fn from(map: Grid<char>) -> Self {
         let mut antenna_map = AntennaMap::new();
         for pos in map.position_iter() {
             match map.value(&pos) {
@@ -124,7 +129,7 @@ fn gcd(a: usize, b: usize) -> usize {
 }
 
 fn scan_city(path: &str) -> City {
-    let map: Map2D<char> = Map2D::from(utils::lines_from_file(path));
+    let map: Grid<char> = file_io::strings_from_file(path).collect_vec().into();
     City::from(map)
 }
 

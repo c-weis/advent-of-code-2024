@@ -1,10 +1,10 @@
+use itertools::Itertools;
+use rusty_advent_2024::utils::file_io;
+use rusty_advent_2024::utils::map2d::grid::{Grid, ValidPosition};
+use rusty_advent_2024::utils::map2d::position::Position;
 use std::str::Chars;
 
-use itertools::Itertools;
-use rusty_advent_2024::maps::*;
-use rusty_advent_2024::utils;
-
-type Puzzle = Map2D<char>;
+type Puzzle = Grid<char>;
 
 #[derive(Clone, Copy)]
 struct StraightLine {
@@ -51,7 +51,7 @@ fn find_x_mas(puzzle: &Puzzle, &pos_a: &ValidPosition) -> bool {
 }
 
 fn part1(path: &str) -> usize {
-    let puzzle: Puzzle = utils::lines_from_file(path).into();
+    let puzzle: Puzzle = file_io::strings_from_file(path).collect_vec().into();
     let directions: Vec<(i32, i32)> = vec![
         (-1, -1),
         (-1, 0),
@@ -80,7 +80,7 @@ fn part1(path: &str) -> usize {
 }
 
 fn part2(path: &str) -> usize {
-    let puzzle: Puzzle = utils::lines_from_file(path).into();
+    let puzzle: Puzzle = file_io::strings_from_file(path).collect_vec().into();
     puzzle
         .position_iter()
         .filter(|pos| -> bool { find_x_mas(&puzzle, pos) })

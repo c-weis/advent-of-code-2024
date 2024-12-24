@@ -1,7 +1,7 @@
 use std::cmp;
 
 use itertools::Itertools;
-use rusty_advent_2024::utils::lines_from_file;
+use rusty_advent_2024::utils::file_io::lines_from_file;
 
 #[derive(Clone, Copy, Debug)]
 enum DataBlock {

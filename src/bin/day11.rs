@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 
 use itertools::Itertools;
-use rusty_advent_2024::utils;
+use rusty_advent_2024::utils::file_io;
 
 type BigNumber = u64;
 type StoneList = Vec<BigNumber>;
 type StoneMap = HashMap<BigNumber, usize>;
 
 fn stone_list_from_file(path: &str) -> StoneList {
-    utils::lines_from_file(path)
+    file_io::lines_from_file(path)
         .map(|line| {
             line.unwrap()
                 .split_whitespace()
@@ -20,7 +20,7 @@ fn stone_list_from_file(path: &str) -> StoneList {
 }
 
 fn stone_map_from_file(path: &str) -> StoneMap {
-    utils::lines_from_file(path)
+    file_io::lines_from_file(path)
         .map(|line| {
             line.unwrap()
                 .split_whitespace()

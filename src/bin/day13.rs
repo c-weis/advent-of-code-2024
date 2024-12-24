@@ -1,9 +1,8 @@
-use std::cmp::min;
-
 use itertools::Itertools;
 use num::Integer;
 use regex::{Captures, Regex};
-use rusty_advent_2024::{maps::IntVec2D, utils};
+use rusty_advent_2024::utils::{file_io, math2d::IntVec2D};
+use std::cmp::min;
 
 type Coordinate = i128;
 
@@ -18,19 +17,19 @@ trait IntoTuple<T> {
     fn into_tuple(self) -> (T, T);
 }
 
-impl IntoTuple<i32> for Captures<'_> {
-    fn into_tuple(self) -> (i32, i32) {
+impl IntoTuple<Coordinate> for Captures<'_> {
+    fn into_tuple(self) -> (Coordinate, Coordinate) {
         (
             self.get(1)
                 .expect("Did not match first group.")
                 .as_str()
                 .parse()
-                .expect("Could not parse group 1 to integer."),
+                .expect("Could not parse group 1."),
             self.get(2)
                 .expect("Did not match second group.")
                 .as_str()
                 .parse()
-                .expect("Could not parse group 2 to integer."),
+                .expect("Could not parse group 2."),
         )
     }
 }
@@ -51,9 +50,9 @@ impl From<&str> for ClawMachine {
             .captures(data_string)
             .expect("Prize data not found.");
 
-        let button_a_data: (i32, i32) = button_a_match.into_tuple();
-        let button_b_data: (i32, i32) = button_b_match.into_tuple();
-        let prize_data: (i32, i32) = prize_match.into_tuple();
+        let button_a_data: (Coordinate, Coordinate) = button_a_match.into_tuple();
+        let button_b_data: (Coordinate, Coordinate) = button_b_match.into_tuple();
+        let prize_data: (Coordinate, Coordinate) = prize_match.into_tuple();
 
         ClawMachine {
             a: IntVec2D::from(button_a_data),
@@ -124,7 +123,7 @@ impl ClawMachine {
 }
 
 fn claw_machines_from_file(path: &str) -> Vec<ClawMachine> {
-    let lines = utils::lines_from_file(path).map(|line| line.unwrap());
+    let lines = file_io::lines_from_file(path).map(|line| line.unwrap());
     lines
         .chunks(4)
         .into_iter()

@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use regex::Regex;
-use rusty_advent_2024::utils::lines_from_file;
+use rusty_advent_2024::utils::file_io::lines_from_file;
 
 fn compute_sum(row: &str) -> i32 {
     let pattern: Regex = Regex::new(r"mul\((\d{1,3}),(\d{1,3})\)").expect("Regex pattern invalid.");

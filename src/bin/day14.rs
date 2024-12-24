@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use itertools::Itertools;
 use regex::Regex;
-use rusty_advent_2024::{maps::IntVec2D, utils};
+use rusty_advent_2024::utils::{math2d::IntVec2D, file_io};
 
 type Number = i32;
 
@@ -62,7 +62,7 @@ fn robots_from_file(path: &str) -> Vec<Robot> {
     let pattern =
         Regex::new(r"p=(.*?),(.*?) v=(.*?),(.*?)$").expect("Creation of regex pattern failed.");
 
-    let lines = utils::lines_from_file(path).map(|line| line.unwrap());
+    let lines = file_io::lines_from_file(path).map(|line| line.unwrap());
 
     lines
         .map(|line| -> Robot {

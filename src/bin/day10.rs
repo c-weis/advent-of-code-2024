@@ -1,13 +1,14 @@
-use rusty_advent_2024::maps::*;
-use rusty_advent_2024::utils;
+use itertools::Itertools;
+use rusty_advent_2024::utils::file_io;
+use rusty_advent_2024::utils::map2d::grid::{Grid, ValidPosition};
 use std::collections::HashSet;
 use std::ops::Deref;
 
 type Height = u32;
-struct Topography(Map2D<Height>);
+struct Topography(Grid<Height>);
 
 impl Deref for Topography {
-    type Target = Map2D<Height>;
+    type Target = Grid<Height>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -16,7 +17,7 @@ impl Deref for Topography {
 
 impl Topography {
     fn from_file(path: &str) -> Self {
-        Topography(Map2D::from(utils::lines_from_file(path)))
+        Topography(file_io::strings_from_file(path).collect_vec().into())
     }
 
     fn targets_reachable_by_trail(

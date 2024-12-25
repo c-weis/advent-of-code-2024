@@ -72,6 +72,17 @@ impl From<char> for Direction {
     }
 }
 
+impl Into<char> for Direction {
+    fn into(self) -> char {
+        match self {
+            Direction::UP => '^',
+            Direction::RIGHT => '>',
+            Direction::DOWN => 'v',
+            Direction::LEFT => '<',
+        }
+    }
+}
+
 impl Position {
     pub fn step(&self, direction: &Direction) -> Position {
         let Position(x, y) = self;

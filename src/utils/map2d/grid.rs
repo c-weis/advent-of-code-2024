@@ -1,3 +1,4 @@
+use crate::utils::map2d::direction::Direction;
 use crate::utils::map2d::position::Position;
 use itertools::Itertools;
 use std::collections::{HashSet, VecDeque};
@@ -42,9 +43,14 @@ impl ValidPosition {
         let pos: Position = (*self).into();
         pos.valid_neighbours(bounds)
     }
+
+    pub fn try_step(&self, direction: &Direction, bounds: &Bounds) -> Option<Self> {
+        let pos: Position = (*self).into();
+        pos.step(direction).in_bounds(bounds)
+    }
 }
 
-impl<T: PartialEq> Grid<T> {
+impl<T> Grid<T> {
     pub fn position_iter(&self) -> impl Iterator<Item = ValidPosition> {
         (0..self.bounds.0)
             .cartesian_product(0..self.bounds.1)
@@ -52,9 +58,15 @@ impl<T: PartialEq> Grid<T> {
     }
 
     pub fn value(&self, pos: &ValidPosition) -> &T {
-        &self.data[pos.0 as usize][pos.1 as usize]
+        &self.data[pos.1 as usize][pos.0 as usize]
     }
 
+    pub fn value_mut(&mut self, pos: &ValidPosition) -> &mut T {
+        &mut self.data[pos.1 as usize][pos.0 as usize]
+    }
+}
+
+impl<T: PartialEq> Grid<T> {
     pub fn find(&self, value: &T) -> HashSet<ValidPosition> {
         self.position_iter()
             .filter(|pos| -> bool { self.value(pos) == value })
@@ -80,5 +92,42 @@ impl<T: PartialEq> Grid<T> {
         }
 
         visited
+    }
+}
+
+pub trait ToChar {
+    fn to_char(self: &Self) -> char;
+}
+
+impl ToChar for char {
+    fn to_char(self: &Self) -> char {
+        *self
+    }
+}
+
+impl<T: ToChar> Grid<T> {
+    pub fn pretty_print_string(&self) -> String {
+        self.data
+            .iter()
+            .map(|vec| vec.iter().map(|c| -> char { c.to_char() }).join(""))
+            .join("\n")
+    }
+}
+
+pub trait Convert<S> {
+    fn convert(&self) -> S;
+}
+
+impl<S: Clone + Into<T>, T> Convert<Grid<T>> for Grid<S> {
+    fn convert(&self) -> Grid<T> {
+        let new_data: Vec<Vec<T>> = self
+            .data
+            .iter()
+            .map(|vec| vec.iter().map(|s| s.clone().into()).collect_vec())
+            .collect_vec();
+        Grid {
+            data: new_data,
+            bounds: self.bounds,
+        }
     }
 }

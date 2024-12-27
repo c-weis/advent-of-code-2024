@@ -50,6 +50,16 @@ impl ValidPosition {
     }
 }
 
+impl<T: Clone> Grid<T> {
+    pub fn new(bounds: Bounds, fill: T) -> Self {
+        let data: Vec<Vec<T>> = (0..bounds.1)
+            .map(|_| -> Vec<T> { (0..bounds.0).map(|_| fill.clone()).collect() })
+            .collect();
+
+        Grid { data, bounds }
+    }
+}
+
 impl<T> Grid<T> {
     pub fn position_iter(&self) -> impl Iterator<Item = ValidPosition> {
         (0..self.bounds.0)

@@ -129,7 +129,7 @@ fn defrag_compress(harddisk: &mut Vec<DataBlock>) {
             DataBlock::Free { size: _ } => {
                 right_idx -= 1;
                 continue;
-            },
+            }
             DataBlock::File {
                 id: file_id,
                 size: file_size,

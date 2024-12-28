@@ -60,13 +60,12 @@ fn blink_map(stone_map: StoneMap) -> StoneMap {
                 let (left, right) = split_digits(&x);
                 *next_map.entry(left).or_insert(0) += count;
                 *next_map.entry(right).or_insert(0) += count;
-            },
-            y => 
-            {
+            }
+            y => {
                 *next_map.entry(y * 2024).or_insert(0) += count;
             }
         }
-    };
+    }
 
     next_map
 }

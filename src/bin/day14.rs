@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use itertools::Itertools;
 use regex::Regex;
-use rusty_advent_2024::utils::{math2d::IntVec2D, file_io};
+use rusty_advent_2024::utils::{file_io, math2d::IntVec2D};
 
 type Number = i32;
 

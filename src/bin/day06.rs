@@ -1,5 +1,8 @@
+use rusty_advent_2024::utils::{
+    file_io::lines_from_file,
+    map2d::{direction::Direction, grid::Bounds, position::Position},
+};
 use std::{collections::HashSet, hash::Hash};
-use rusty_advent_2024::utils::{file_io::lines_from_file, map2d::{direction::Direction, grid::Bounds, position::Position}};
 
 #[derive(Hash, PartialEq, Eq, Clone, Copy)]
 struct Guard {

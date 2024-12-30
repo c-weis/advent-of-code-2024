@@ -159,28 +159,28 @@ mod tests {
         let pos1 = Position(5, 4);
         let pos2 = Position(7, 4);
         let pos3 = Position(10, 10);
-        assert!(pos1.mirrored_across(&pos2) == Position(9, 4));
-        assert!(pos2.mirrored_across(&pos1) == Position(3, 4));
-        assert!(pos1.mirrored_across(&pos3) == Position(15, 16));
-        assert!(pos3.mirrored_across(&pos1) == Position(0, -2));
+        assert_eq!(pos1.mirrored_across(&pos2), Position(9, 4));
+        assert_eq!(pos2.mirrored_across(&pos1), Position(3, 4));
+        assert_eq!(pos1.mirrored_across(&pos3), Position(15, 16));
+        assert_eq!(pos3.mirrored_across(&pos1), Position(0, -2));
     }
 
     #[test]
     fn test_gcd() {
-        assert!(gcd(20, 5) == 5);
-        assert!(gcd(5, 20) == 5);
-        assert!(gcd(0, 8) == 8);
-        assert!(gcd(3824, 218) == 2);
-        assert!(gcd(91, 26) == 13);
+        assert_eq!(gcd(20, 5), 5);
+        assert_eq!(gcd(5, 20), 5);
+        assert_eq!(gcd(0, 8), 8);
+        assert_eq!(gcd(3824, 218), 2);
+        assert_eq!(gcd(91, 26), 13);
     }
 
     #[test]
     fn test_part1() {
-        assert!(part1("input/input08.txt.test1") == 14);
+        assert_eq!(part1("input/input08.txt.test1"), 14);
     }
 
     #[test]
     fn test_part2() {
-        assert!(part2("input/input08.txt.test1") == 34);
+        assert_eq!(part2("input/input08.txt.test1"), 34);
     }
 }

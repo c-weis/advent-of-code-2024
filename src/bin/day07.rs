@@ -100,7 +100,7 @@ mod tests {
         assert!(equation_possible(8, &[1, 4, 3], false));
         assert!(!equation_possible(14, &[1, 4, 3], false));
         assert!(equation_possible(15, &[1, 4, 3], false));
-        assert!(part1("input/input07.txt.test1") == 3749);
+        assert_eq!(part1("input/input07.txt.test1"), 3749);
     }
 
     #[test]
@@ -111,6 +111,6 @@ mod tests {
         assert!(equation_possible(3511, &[5, 7, 11], true));
         assert!(equation_possible(5147, &[5, 100, 47], true));
         assert!(!equation_possible(5148, &[5, 100, 47], true));
-        assert!(part2("input/input07.txt.test1") == 11387);
+        assert_eq!(part2("input/input07.txt.test1"), 11387);
     }
 }

@@ -228,31 +228,31 @@ mod tests {
         // If register C contains 9, the program 2,6 would set register B to 1.
         let mut prog1 = ProgramState::new("2,6").set_c(9);
         prog1.run();
-        assert!(prog1.b == 1);
+        assert_eq!(prog1.b, 1);
         // If register A contains 10, the program 5,0,5,1,5,4 would output 0,1,2.
         let mut prog2 = ProgramState::new("5,0,5,1,5,4").set_a(10);
-        assert!(prog2.run() == "0,1,2");
+        assert_eq!(prog2.run(), "0,1,2");
         // If register A contains 2024, the program 0,1,5,4,3,0 would output 4,2,5,6,7,7,7,7,3,1,0 and leave 0 in register A.
         let mut prog3 = ProgramState::new("0,1,5,4,3,0").set_a(2024);
-        assert!(prog3.run() == "4,2,5,6,7,7,7,7,3,1,0");
-        assert!(prog3.a == 0);
+        assert_eq!(prog3.run(), "4,2,5,6,7,7,7,7,3,1,0");
+        assert_eq!(prog3.a, 0);
         // If register B contains 29, the program 1,7 would set register B to 26.
         let mut prog4 = ProgramState::new("1,7").set_b(29);
         prog4.run();
-        assert!(prog4.b == 26);
+        assert_eq!(prog4.b, 26);
         // If register B contains 2024 and register C contains 43690, the program 4,0 would set register B to 44354
         let mut prog5 = ProgramState::new("4,0").set_b(2024).set_c(43690);
         prog5.run();
-        assert!(prog5.b == 44354);
+        assert_eq!(prog5.b, 44354);
     }
 
     #[test]
     fn test_part1() {
-        assert!(part1("input/input17.txt.test1") == "4,6,3,5,6,3,5,2,1,0");
+        assert_eq!(part1("input/input17.txt.test1"), "4,6,3,5,6,3,5,2,1,0");
     }
 
     #[test]
     fn test_part2() {
-        assert!(part2("input/input17.txt.test2") == Some(117440))
+        assert_eq!(part2("input/input17.txt.test2"), Some(117440))
     }
 }

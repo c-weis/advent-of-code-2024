@@ -136,11 +136,11 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        assert!(part1("input/input06.txt.test1") == 41);
+        assert_eq!(part1("input/input06.txt.test1"), 41);
     }
 
     #[test]
     fn test_part2() {
-        assert!(part2("input/input06.txt.test1") == 6);
+        assert_eq!(part2("input/input06.txt.test1"), 6);
     }
 }

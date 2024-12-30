@@ -145,6 +145,6 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        assert!(part1("input/input14.txt.test1", Torus(11, 7)) == 12);
+        assert_eq!(part1("input/input14.txt.test1", Torus(11, 7)), 12);
     }
 }

@@ -116,14 +116,14 @@ mod tests {
 
     #[test]
     fn test_blink() {
-        assert!(blink_list(vec![0]) == vec![1]);
-        assert!(blink_list(vec![1234]) == vec![12, 34]);
-        assert!(blink_list(vec![1]) == vec![2024]);
-        assert!(blink_list(vec![10, 3, 0]) == vec![1, 0, 6072, 1]);
+        assert_eq!(blink_list(vec![0]), vec![1]);
+        assert_eq!(blink_list(vec![1234]), vec![12, 34]);
+        assert_eq!(blink_list(vec![1]), vec![2024]);
+        assert_eq!(blink_list(vec![10, 3, 0]), vec![1, 0, 6072, 1]);
     }
 
     #[test]
     fn test_part1() {
-        assert!(part1("input/input11.txt.test1") == 55312);
+        assert_eq!(part1("input/input11.txt.test1"), 55312);
     }
 }

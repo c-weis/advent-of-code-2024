@@ -127,11 +127,11 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        assert!(part1("input/input05.txt.test1") == 143);
+        assert_eq!(part1("input/input05.txt.test1"), 143);
     }
 
     #[test]
     fn test_part2() {
-        assert!(part2("input/input05.txt.test1") == 123);
+        assert_eq!(part2("input/input05.txt.test1"), 123);
     }
 }

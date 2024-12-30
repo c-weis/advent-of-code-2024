@@ -309,12 +309,12 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        assert!(part1("input/input15.txt.test1") == 2028);
-        assert!(part1("input/input15.txt.test2") == 10092);
+        assert_eq!(part1("input/input15.txt.test1"), 2028);
+        assert_eq!(part1("input/input15.txt.test2"), 10092);
     }
 
     #[test]
     fn test_part2() {
-        assert!(part2("input/input15.txt.test2", false) == 9021);
+        assert_eq!(part2("input/input15.txt.test2", false), 9021);
     }
 }

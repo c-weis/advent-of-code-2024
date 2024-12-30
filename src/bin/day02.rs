@@ -121,23 +121,23 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        assert!(is_safe_report(&vec![1, 3, 4, 5, 7]) == true);
+        assert!(is_safe_report(&vec![1, 3, 4, 5, 7]));
+        assert!(is_safe_report(&vec![7, 5, 4, 3, 1]));
+        assert!(is_safe_report(&vec![7, 4, 3, 2, 1]));
         assert!(is_safe_report(&vec![1, 3, 4, 3, 5]) == false);
-        assert!(is_safe_report(&vec![7, 5, 4, 3, 1]) == true);
-        assert!(is_safe_report(&vec![7, 4, 3, 2, 1]) == true);
         assert!(is_safe_report(&vec![8, 4, 3, 2, 1]) == false);
-        assert!(part1("input/input02.txt.test1") == 2);
+        assert_eq!(part1("input/input02.txt.test1"), 2);
     }
 
     #[test]
     fn test_part2() {
-        assert!(is_safe_report_with_damper(&vec![1, 3, 4, 5, 7]) == true);
-        assert!(is_safe_report_with_damper(&vec![8, 5, 4, 2, 1]) == true);
-        assert!(is_safe_report_with_damper(&vec![1, 3, 4, 3, 5]) == true);
-        assert!(is_safe_report_with_damper(&vec![7, 8, 4, 3, 1]) == true);
-        assert!(is_safe_report_with_damper(&vec![3, 4, 3, 2, 1]) == true);
-        assert!(is_safe_report_with_damper(&vec![4, 3, 2, 1, 3]) == true);
+        assert!(is_safe_report_with_damper(&vec![1, 3, 4, 5, 7]));
+        assert!(is_safe_report_with_damper(&vec![8, 5, 4, 2, 1]));
+        assert!(is_safe_report_with_damper(&vec![1, 3, 4, 3, 5]));
+        assert!(is_safe_report_with_damper(&vec![7, 8, 4, 3, 1]));
+        assert!(is_safe_report_with_damper(&vec![3, 4, 3, 2, 1]));
+        assert!(is_safe_report_with_damper(&vec![4, 3, 2, 1, 3]));
         assert!(is_safe_report_with_damper(&vec![4, 3, 4, 3, 4]) == false);
-        assert!(part2("input/input02.txt.test1") == 4);
+        assert_eq!(part2("input/input02.txt.test1"), 4);
     }
 }

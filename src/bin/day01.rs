@@ -36,13 +36,13 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        assert!(part1("input/input01.txt.test1") == 0);
-        assert!(part1("input/input01.txt.test2") == 15);
+        assert_eq!(part1("input/input01.txt.test1"), 0);
+        assert_eq!(part1("input/input01.txt.test2"), 15);
     }
 
     #[test]
     fn test_part2() {
-        assert!(part2("input/input01.txt.test1") == 6);
-        assert!(part2("input/input01.txt.test2") == 60);
+        assert_eq!(part2("input/input01.txt.test1"), 6);
+        assert_eq!(part2("input/input01.txt.test2"), 60);
     }
 }

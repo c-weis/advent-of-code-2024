@@ -165,6 +165,6 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        assert!(part1("input/input13.txt.test1") == 480);
+        assert_eq!(part1("input/input13.txt.test1"), 480);
     }
 }

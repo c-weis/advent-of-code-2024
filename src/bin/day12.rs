@@ -136,16 +136,16 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        assert!(part1("input/input12.txt.test1") == 140);
-        assert!(part1("input/input12.txt.test2") == 772);
-        assert!(part1("input/input12.txt.test3") == 1930);
+        assert_eq!(part1("input/input12.txt.test1"), 140);
+        assert_eq!(part1("input/input12.txt.test2"), 772);
+        assert_eq!(part1("input/input12.txt.test3"), 1930);
     }
 
     #[test]
     fn test_part2() {
-        assert!(part2("input/input12.txt.test1") == 80);
-        assert!(part2("input/input12.txt.test2") == 436);
-        assert!(part2("input/input12.txt.test4") == 236);
-        assert!(part2("input/input12.txt.test5") == 368);
+        assert_eq!(part2("input/input12.txt.test1"), 80);
+        assert_eq!(part2("input/input12.txt.test2"), 436);
+        assert_eq!(part2("input/input12.txt.test4"), 236);
+        assert_eq!(part2("input/input12.txt.test5"), 368);
     }
 }

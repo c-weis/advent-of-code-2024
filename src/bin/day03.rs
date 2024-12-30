@@ -59,18 +59,18 @@ mod tests {
 
     #[test]
     fn test_compute_sum() {
-        assert!(compute_sum("mul(100,002)") == 200);
-        assert!(compute_sum("mul (100,002)lkdsjflshalasjf") == 0);
-        assert!(compute_sum("mul(mul(10,7)40,200)mul(10,3)") == 100);
+        assert_eq!(compute_sum("mul(100,002)"), 200);
+        assert_eq!(compute_sum("mul (100,002)lkdsjflshalasjf"), 0);
+        assert_eq!(compute_sum("mul(mul(10,7)40,200)mul(10,3)"), 100);
     }
 
     #[test]
     fn test_part1() {
-        assert!(part1("input/input03.txt.test1") == 161);
+        assert_eq!(part1("input/input03.txt.test1"), 161);
     }
 
     #[test]
     fn test_part2() {
-        assert!(part2("input/input03.txt.test2") == 48);
+        assert_eq!(part2("input/input03.txt.test2"), 48);
     }
 }

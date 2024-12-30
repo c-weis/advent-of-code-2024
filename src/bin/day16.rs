@@ -189,13 +189,13 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        assert!(part1("input/input16.txt.test1") == 7036);
-        assert!(part1("input/input16.txt.test2") == 11048);
+        assert_eq!(part1("input/input16.txt.test1"), 7036);
+        assert_eq!(part1("input/input16.txt.test2"), 11048);
     }
 
     #[test]
     fn test_part2() {
-        assert!(part2("input/input16.txt.test1") == 45);
-        assert!(part2("input/input16.txt.test2") == 64);
+        assert_eq!(part2("input/input16.txt.test1"), 45);
+        assert_eq!(part2("input/input16.txt.test2"), 64);
     }
 }

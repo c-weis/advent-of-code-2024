@@ -237,18 +237,18 @@ mod tests {
 
     #[test]
     fn test_partial_checksum() {
-        assert!(partial_checksum(7, 10, 5) == 7 * (10 + 11 + 12 + 13 + 14))
+        assert_eq!(partial_checksum(7, 10, 5), 7 * (10 + 11 + 12 + 13 + 14))
     }
 
     #[test]
     fn test_tiny_disks() {
         // "2": 00 -> 00
         let hdd1 = compressed(&blocks_from_string(String::from("2")));
-        assert!(checksum(&hdd1) == 0);
+        assert_eq!(checksum(&hdd1), 0);
 
         // "232": 00...11 -> 0011...
         let hdd2 = compressed(&blocks_from_string(String::from("232")));
-        assert!(checksum(&hdd2) == 5);
+        assert_eq!(checksum(&hdd2), 5);
 
         // "12345": 0..111....22222 -> 022111222.....
         let hdd3 = compressed(&blocks_from_string(String::from("12345")));
@@ -262,7 +262,7 @@ mod tests {
 
         // "3132": 000.111.. -> 000111...
         let hdd4 = compressed(&blocks_from_string(String::from("3132")));
-        assert!(checksum(&hdd4) == 3 + 4 + 5);
+        assert_eq!(checksum(&hdd4), 3 + 4 + 5);
     }
 
     #[test]
@@ -270,12 +270,12 @@ mod tests {
         // "2": 00 -> 00
         let mut hdd1 = blocks_from_string(String::from("2"));
         defrag_compress(&mut hdd1);
-        assert!(checksum(&hdd1) == 0);
+        assert_eq!(checksum(&hdd1), 0);
 
         // "232": 00...11 -> 0011...
         let mut hdd2 = blocks_from_string(String::from("232"));
         defrag_compress(&mut hdd2);
-        assert!(checksum(&hdd2) == 5);
+        assert_eq!(checksum(&hdd2), 5);
 
         // "12345": 0..111....22222 -> 0..111....22222
         let mut hdd3 = blocks_from_string(String::from("12345"));
@@ -290,16 +290,16 @@ mod tests {
         // "3132": 000.111.. -> 000.111..
         let mut hdd4 = blocks_from_string(String::from("3132"));
         defrag_compress(&mut hdd4);
-        assert!(checksum(&hdd4) == 4 + 5 + 6);
+        assert_eq!(checksum(&hdd4), 4 + 5 + 6);
     }
 
     #[test]
     fn test_part1() {
-        assert!(part1("input/input09.txt.test1") == 1928);
+        assert_eq!(part1("input/input09.txt.test1"), 1928);
     }
 
     #[test]
     fn test_part2() {
-        assert!(part2("input/input09.txt.test1") == 2858);
+        assert_eq!(part2("input/input09.txt.test1"), 2858);
     }
 }

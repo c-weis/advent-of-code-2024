@@ -96,10 +96,32 @@ impl RaceTrack {
         .collect()
     }
 
+    const DX_DY_NEIGHBOURS_20: [(i32, i32); 841] = {
+        let mut arr = [(0, 0); 21 * 21 + 20 * 20];
+        let mut idx = 0;
+        let mut x = -20;
+        while x <= 20 {
+            let max_y: i32;
+            if x > 0 {
+                max_y = 20 - x;
+            } else {
+                max_y = 20 + x;
+            }
+            let mut y = -max_y;
+            while y <= max_y {
+                arr[idx] = (x, y);
+
+                idx += 1;
+                y += 1;
+            }
+            x += 1;
+        }
+        arr
+    };
+
     fn valid_neighbours_20(&self, pos: ValidPosition) -> Vec<ValidPosition> {
-        (-20..=20)
-            .cartesian_product(-20..=20)
-            .filter(|&(dx, dy)| abs(dx) + abs(dy) <= 20)
+        Self::DX_DY_NEIGHBOURS_20
+            .iter()
             .map(|(dx, dy)| Position(pos.0 as i32 + dx, pos.1 as i32 + dy))
             .filter_map(|pos| pos.in_bounds(&self.field.bounds))
             .collect()

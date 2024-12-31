@@ -48,6 +48,7 @@ impl From<NumericKey> for IntVec2D<i32> {
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 struct InvalidKeypadPositionError(i32, i32);
 impl TryFrom<IntVec2D<i32>> for NumericKey {
     type Error = InvalidKeypadPositionError;
@@ -361,7 +362,7 @@ fn complexity(
         .sum()
 }
 
-fn pretty_print(control_sequence: &Sequence<DirectionalKey>) {
+fn _pretty_print(control_sequence: &Sequence<DirectionalKey>) {
     println!(
         "{}, len: {}",
         control_sequence

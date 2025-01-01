@@ -39,6 +39,7 @@ impl Display for GateType {
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 struct InvalidGateString(String);
 impl FromStr for GateType {
     type Err = InvalidGateString;
@@ -84,6 +85,7 @@ struct Device {
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 enum SpecialParseBoolError {
     WrongChar(char),
     WrongLength(usize),
@@ -108,7 +110,6 @@ enum DeviceError {
 struct Adder {
     x_in: String,
     y_in: String,
-    c_in: String,
     bit_xor: String,
     bit_and: String,
     pre_c_out: String,
@@ -160,6 +161,7 @@ impl Device {
         num
     }
 
+    #[allow(dead_code)]
     fn set_x_y(&mut self, x: u64, y: u64) {
         self.known_values.clear();
 
@@ -172,10 +174,12 @@ impl Device {
         }
     }
 
+    #[allow(dead_code)]
     fn x(&self) -> u64 {
         self._assemble('x')
     }
 
+    #[allow(dead_code)]
     fn y(&self) -> u64 {
         self._assemble('y')
     }
@@ -193,10 +197,6 @@ impl Device {
         }
 
         Ok(self._assemble('z'))
-    }
-
-    fn is_valid(&mut self) -> bool {
-        !self.z().is_err()
     }
 
     fn swap_gates(&mut self, name1: &String, name2: &String) {
@@ -363,7 +363,6 @@ impl Device {
             adders.push(Adder {
                 x_in: Self::x_str(bit),
                 y_in: Self::y_str(bit),
-                c_in: carry_gates[bit].clone(),
                 bit_xor: bit_xor_gates[bit].clone(),
                 bit_and: bit_and_gates[bit].clone(),
                 pre_c_out: pre_carry_gates[bit + 1].clone(),
@@ -443,27 +442,6 @@ fn mermaid_diagram(device: &Device) -> String {
         })
         .join("\n");
 
-    /*let mermaid_connectors: String = adders
-        .iter()
-        .flat_map(|adder| {
-            vec![
-                (adder.x_in.clone(), adder.bit_xor.clone()),
-                (adder.x_in.clone(), adder.bit_and.clone()),
-                (adder.y_in.clone(), adder.bit_xor.clone()),
-                (adder.y_in.clone(), adder.bit_and.clone()),
-                (adder.c_in.clone(), adder.s_out.clone()),
-                (adder.c_in.clone(), adder.pre_c_out.clone()),
-                (adder.bit_xor.clone(), adder.s_out.clone()),
-                (adder.bit_xor.clone(), adder.pre_c_out.clone()),
-                (adder.pre_c_out.clone(), adder.c_out.clone()),
-                (adder.bit_and.clone(), adder.c_out.clone()),
-                (format!("{}_", adder.s_out), adder.s_out.clone()),
-            ]
-        })
-        .map(|(source, target)| format!("    {}-->{}", source, target))
-        .join("\n");
-    */
-
     let mermaid_connectors: String = device
         .gate_map
         .iter()
@@ -475,9 +453,6 @@ fn mermaid_diagram(device: &Device) -> String {
             )
         })
         .collect();
-
-    //.map(|(source, target)| format!("    {}-->{}", source, target))
-    //.join("\n");
 
     [
         "\n",
@@ -498,22 +473,6 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_gate_eq() {
-        assert_eq!(
-            Gate {
-                a: "a".into(),
-                b: "b".into(),
-                op: GateType::AND
-            },
-            Gate {
-                a: "b".into(),
-                b: "a".into(),
-                op: GateType::AND
-            }
-        )
-    }
 
     #[test]
     fn test_part1() {
